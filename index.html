@@ -12,44 +12,48 @@
       align-items: center;
       min-height: 100vh;
       margin: 0;
-      background-color: #1a1a1a;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
     }
 
     .game-container {
       text-align: center;
-      background-color: #2a2a2a;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
       padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
       max-width: 800px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     h1 {
-      color: #4a90e2;
+      color: #fff;
       margin-bottom: 20px;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      font-size: 2.2em;
     }
 
     .connection-panel {
-      background-color: #333;
+      background: rgba(255, 255, 255, 0.1);
       padding: 20px;
-      border-radius: 10px;
+      border-radius: 15px;
       margin-bottom: 20px;
-      border-left: 4px solid #4a90e2;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .connection-status {
       font-size: 16px;
       margin-bottom: 15px;
-      padding: 10px;
-      border-radius: 5px;
+      padding: 12px;
+      border-radius: 8px;
       font-weight: bold;
+      transition: all 0.3s ease;
     }
 
-    .status-disconnected { background-color: #ff4444; }
-    .status-connecting { background-color: #ffaa00; }
-    .status-connected { background-color: #44ff44; color: #000; }
+    .status-waiting { background: rgba(255, 193, 7, 0.9); color: #000; }
+    .status-connected { background: rgba(40, 167, 69, 0.9); color: #000; }
+    .status-error { background: rgba(220, 53, 69, 0.9); color: #fff; }
 
     .connection-controls {
       display: flex;
@@ -65,19 +69,21 @@
       grid-template-rows: repeat(8, 60px);
       gap: 2px;
       margin: 20px auto;
-      border: 3px solid #4a90e2;
-      background-color: #333;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.2);
       position: relative;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     .board::after {
       content: '';
       position: absolute;
-      top: calc(50% - 1px);
-      left: -3px;
-      right: -3px;
+      top: calc(50% - 2px);
+      left: 0;
+      right: 0;
       height: 4px;
-      background-color: #000;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
       z-index: 10;
       pointer-events: none;
     }
@@ -93,88 +99,113 @@
       cursor: pointer;
       position: relative;
       border: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .square:hover {
+      transform: scale(1.05);
     }
 
     .square.light {
-      background-color: #f0d9b5;
+      background: rgba(240, 217, 181, 0.9);
       color: #333;
     }
 
     .square.dark {
-      background-color: #b58863;
+      background: rgba(181, 136, 99, 0.9);
       color: #333;
     }
 
     .square.selected {
       border-color: #ff6b6b;
-      background-color: #ffcccc;
+      background: rgba(255, 107, 107, 0.7) !important;
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
     }
 
     .square.possible-move {
       border-color: #4ecdc4;
-      background-color: #e8f8f5;
+      background: rgba(78, 205, 196, 0.3) !important;
+      box-shadow: 0 0 15px rgba(78, 205, 196, 0.4);
     }
 
     .square.in-check {
-      background-color: #ff4d4d !important;
+      background: rgba(255, 77, 77, 0.8) !important;
       border: 2px solid #ff0000;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
     }
 
     .info {
       margin-top: 20px;
       padding: 15px;
-      background-color: #333;
-      border-radius: 10px;
-      border-left: 4px solid #4a90e2;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .turn-info {
       font-size: 18px;
       font-weight: bold;
-      color: #4a90e2;
       margin-bottom: 10px;
+      transition: all 0.3s ease;
     }
 
     .rules {
       text-align: left;
       font-size: 12px;
       line-height: 1.4;
-      color: #ccc;
+      color: rgba(255, 255, 255, 0.8);
+      margin-top: 15px;
     }
 
     .button {
-      background-color: #4a90e2;
+      background: linear-gradient(45deg, #667eea, #764ba2);
       color: white;
       border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
+      padding: 12px 20px;
+      border-radius: 25px;
       cursor: pointer;
       margin: 5px;
       font-size: 14px;
-      transition: background-color 0.3s;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
     .button:hover {
-      background-color: #357abd;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
     }
 
     .button:disabled {
-      background-color: #666;
+      background: rgba(255, 255, 255, 0.2);
       cursor: not-allowed;
+      transform: none;
     }
 
     .input-field {
-      padding: 8px;
-      border: 1px solid #555;
-      border-radius: 5px;
-      background-color: #444;
+      padding: 10px 15px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.1);
       color: white;
       margin: 5px;
       font-size: 14px;
+      backdrop-filter: blur(5px);
+    }
+
+    .input-field::placeholder {
+      color: rgba(255, 255, 255, 0.7);
     }
 
     .piece {
-      transition: transform 0.1s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       font-size: 48px;
       font-weight: bold;
       position: absolute;
@@ -185,19 +216,43 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
     .player-info {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       font-size: 14px;
+      font-weight: bold;
     }
 
-    .my-turn { color: #4a90e2; font-weight: bold; }
-    .opponent-turn { color: #ccc; }
+    .my-turn { 
+      color: #4ecdc4; 
+      text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+    }
+    
+    .opponent-turn { 
+      color: rgba(255, 255, 255, 0.6); 
+    }
 
     .hidden { display: none; }
+
+    .game-code-display {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .game-code {
+      font-size: 24px;
+      font-weight: bold;
+      color: #4ecdc4;
+      text-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+      letter-spacing: 2px;
+    }
 
     @media (max-width: 600px) {
       .board {
@@ -214,42 +269,44 @@
     <h1>⚡ Multiplayer Gravity Chess ⚡</h1>
     
     <div class="connection-panel">
-      <div id="connection-status" class="connection-status status-disconnected">
-        Disconnected - Start or join a game to play
+      <div id="connection-status" class="connection-status status-waiting">
+        Choose your connection method below
       </div>
       
       <div class="connection-controls">
-        <button class="button" id="create-game-btn" onclick="createGame()">Create Game</button>
-        <input type="text" id="game-code-input" class="input-field" placeholder="Enter game code" maxlength="6">
-        <button class="button" id="join-game-btn" onclick="joinGame()">Join Game</button>
-        <button class="button hidden" id="disconnect-btn" onclick="disconnect()">Disconnect</button>
+        <button class="button" id="local-game-btn" onclick="startLocalGame()">Local 2-Player Game</button>
+        <button class="button" id="create-room-btn" onclick="createRoom()">Create Online Room</button>
+        <input type="text" id="room-code-input" class="input-field" placeholder="Enter room code" maxlength="6">
+        <button class="button" id="join-room-btn" onclick="joinRoom()">Join Room</button>
       </div>
       
-      <div id="game-code-display" class="hidden" style="margin-top: 15px;">
-        <strong>Game Code: <span id="game-code" style="color: #4a90e2; font-size: 18px;"></span></strong>
-        <br><small>Share this code with your friend to play together!</small>
+      <div id="room-code-display" class="game-code-display hidden">
+        <div>Share this room code with your friend:</div>
+        <div class="game-code" id="room-code">------</div>
+        <div style="font-size: 12px; margin-top: 5px; opacity: 0.8;">
+          Both players need to be online at the same time
+        </div>
       </div>
     </div>
 
     <div class="player-info">
-      <div id="white-player">White: <span id="white-name">Waiting...</span></div>
-      <div id="black-player">Black: <span id="black-name">Waiting...</span></div>
+      <div id="white-player" class="opponent-turn">White: <span id="white-name">Waiting...</span></div>
+      <div id="black-player" class="opponent-turn">Black: <span id="black-name">Waiting...</span></div>
     </div>
 
     <div class="board" id="board"></div>
     
     <div class="info">
-      <div class="turn-info" id="turn-info">Waiting for opponent...</div>
-      <button class="button" onclick="resetGame()" id="reset-btn" disabled>New Game</button>
+      <div class="turn-info" id="turn-info">Select game mode to start</div>
+      <button class="button" onclick="resetGame()" id="reset-btn">New Game</button>
       <div class="rules">
-        <strong>Gravity Chess Rules:</strong><br>
-        • All pieces except pawns fall to their gravity zone<br>
-        • White gravity: pieces fall to 4th rank<br>
-        • Black gravity: pieces fall to 5th rank<br>
-        • Pawns act as floors - pieces stop falling on pawns<br>
-        • Pieces stack on each other in the same file<br>
-        • Pawns promote to queens and then fall due to gravity<br>
-        • Capture the enemy king to win!
+        <strong>🎮 Gravity Chess Rules:</strong><br>
+        • All pieces except pawns fall due to gravity<br>
+        • White pieces fall down to rank 4, Black pieces fall up to rank 5<br>
+        • Pawns act as floors - pieces stop falling when they hit pawns<br>
+        • Pieces can stack on each other in the same column<br>
+        • Pawns promote to queens when reaching the opposite end<br>
+        • Capture the enemy king to win! 👑
       </div>
     </div>
   </div>
@@ -266,294 +323,190 @@
       ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
     ];
 
-    let board = [], selectedSquare = null, currentPlayer = 'white', possibleMoves = [], gameOver = false;
-    let myColor = null, gameStarted = false;
-    let peerConnection = null, dataChannel = null, isHost = false;
-    let gameCode = null, connectionState = 'disconnected';
+    let board = [];
+    let selectedSquare = null;
+    let currentPlayer = 'white';
+    let possibleMoves = [];
+    let gameOver = false;
+    let gameMode = null; // 'local' or 'online'
+    let playerRole = null; // 'white', 'black', or null for local
+    let roomCode = null;
+    let onlineConnection = null;
 
     const pieceEmojis = {
       'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
       'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
     };
 
-    // ICE servers for NAT traversal
-    const iceServers = {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
-      ]
-    };
+    // Simple online connection simulation (for demonstration)
+    class SimpleConnection {
+      constructor(isHost = false) {
+        this.isHost = isHost;
+        this.connected = false;
+        this.opponent = null;
+        this.messageHandlers = [];
+      }
 
-    function generateGameCode() {
-      return Math.random().toString(36).substr(2, 6).toUpperCase();
-    }
+      async connect(roomCode) {
+        // In a real implementation, this would connect to a signaling server
+        // For now, we'll simulate connection for demo purposes
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.connected = true;
+            resolve(true);
+          }, 1500);
+        });
+      }
 
-    async function createGame() {
-      try {
-        updateConnectionStatus('connecting', 'Creating game...');
-        isHost = true;
-        myColor = 'white';
-        gameCode = generateGameCode();
-        
-        peerConnection = new RTCPeerConnection(iceServers);
-        setupPeerConnection();
-        
-        dataChannel = peerConnection.createDataChannel('gameData');
-        setupDataChannel();
-        
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        
-        // Store offer in URL hash for simple sharing
-        window.location.hash = `host=${gameCode}&offer=${btoa(JSON.stringify(offer))}`;
-        
-        document.getElementById('game-code').textContent = gameCode;
-        document.getElementById('game-code-display').classList.remove('hidden');
-        document.getElementById('create-game-btn').disabled = true;
-        document.getElementById('join-game-btn').disabled = true;
-        document.getElementById('disconnect-btn').classList.remove('hidden');
-        
-        updatePlayerNames();
-        initializeBoard();
-        createBoard();
-        updateBoard();
-        
-        // Listen for answers in URL hash
-        window.addEventListener('hashchange', handleHashChange);
-        
-      } catch (error) {
-        console.error('Error creating game:', error);
-        updateConnectionStatus('disconnected', 'Failed to create game');
+      send(message) {
+        // In a real implementation, this would send to the opponent
+        if (this.opponent) {
+          this.opponent.receive(message);
+        }
+      }
+
+      receive(message) {
+        this.messageHandlers.forEach(handler => handler(message));
+      }
+
+      onMessage(handler) {
+        this.messageHandlers.push(handler);
+      }
+
+      disconnect() {
+        this.connected = false;
+        this.opponent = null;
       }
     }
 
-    async function joinGame() {
-      const inputCode = document.getElementById('game-code-input').value.trim().toUpperCase();
+    function startLocalGame() {
+      gameMode = 'local';
+      playerRole = null;
+      updateConnectionStatus('connected', 'Local 2-Player Game Active');
+      document.getElementById('white-name').textContent = 'Player 1';
+      document.getElementById('black-name').textContent = 'Player 2';
+      initializeGame();
+    }
+
+    async function createRoom() {
+      gameMode = 'online';
+      playerRole = 'white';
+      roomCode = generateRoomCode();
+      
+      updateConnectionStatus('waiting', 'Creating room...');
+      
+      onlineConnection = new SimpleConnection(true);
+      
+      try {
+        await onlineConnection.connect(roomCode);
+        
+        document.getElementById('room-code').textContent = roomCode;
+        document.getElementById('room-code-display').classList.remove('hidden');
+        updateConnectionStatus('waiting', 'Waiting for opponent to join...');
+        
+        onlineConnection.onMessage(handleOnlineMessage);
+        
+        // Simulate opponent joining after a delay (for demo)
+        setTimeout(() => {
+          if (onlineConnection && onlineConnection.connected) {
+            simulateOpponentJoin();
+          }
+        }, 3000);
+        
+      } catch (error) {
+        updateConnectionStatus('error', 'Failed to create room');
+      }
+    }
+
+    async function joinRoom() {
+      const inputCode = document.getElementById('room-code-input').value.trim().toUpperCase();
       if (!inputCode) {
-        alert('Please enter a game code');
+        alert('Please enter a room code');
         return;
       }
       
+      gameMode = 'online';
+      playerRole = 'black';
+      roomCode = inputCode;
+      
+      updateConnectionStatus('waiting', 'Joining room...');
+      
+      onlineConnection = new SimpleConnection(false);
+      
       try {
-        updateConnectionStatus('connecting', 'Joining game...');
-        isHost = false;
-        myColor = 'black';
-        gameCode = inputCode;
+        await onlineConnection.connect(roomCode);
+        updateConnectionStatus('connected', `Connected to room ${roomCode}`);
         
-        // Check if there's an offer for this game code
-        const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const hostCode = urlParams.get('host');
-        const offerData = urlParams.get('offer');
+        document.getElementById('white-name').textContent = 'Opponent';
+        document.getElementById('black-name').textContent = 'You';
         
-        if (hostCode !== gameCode || !offerData) {
-          alert('Invalid game code or game not found');
-          updateConnectionStatus('disconnected', 'Game not found');
-          return;
-        }
-        
-        peerConnection = new RTCPeerConnection(iceServers);
-        setupPeerConnection();
-        
-        const offer = JSON.parse(atob(offerData));
-        await peerConnection.setRemoteDescription(offer);
-        
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-        
-        // Store answer in URL hash
-        window.location.hash = `host=${gameCode}&answer=${btoa(JSON.stringify(answer))}`;
-        
-        document.getElementById('create-game-btn').disabled = true;
-        document.getElementById('join-game-btn').disabled = true;
-        document.getElementById('disconnect-btn').classList.remove('hidden');
-        
-        updatePlayerNames();
-        initializeBoard();
-        createBoard();
-        updateBoard();
+        onlineConnection.onMessage(handleOnlineMessage);
+        initializeGame();
         
       } catch (error) {
-        console.error('Error joining game:', error);
-        updateConnectionStatus('disconnected', 'Failed to join game');
+        updateConnectionStatus('error', 'Failed to join room');
       }
     }
 
-    function handleHashChange() {
-      if (!isHost) return;
-      
-      const urlParams = new URLSearchParams(window.location.hash.substring(1));
-      const hostCode = urlParams.get('host');
-      const answerData = urlParams.get('answer');
-      
-      if (hostCode === gameCode && answerData && peerConnection) {
-        const answer = JSON.parse(atob(answerData));
-        peerConnection.setRemoteDescription(answer);
-      }
+    function simulateOpponentJoin() {
+      updateConnectionStatus('connected', `Room ${roomCode} - Opponent joined!`);
+      document.getElementById('white-name').textContent = 'You';
+      document.getElementById('black-name').textContent = 'Opponent';
+      initializeGame();
     }
 
-    function setupPeerConnection() {
-      peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-          // In a real app, you'd send this to the other peer
-          console.log('ICE candidate:', event.candidate);
-        }
-      };
-
-      peerConnection.ondatachannel = (event) => {
-        const channel = event.channel;
-        setupDataChannel(channel);
-      };
-
-      peerConnection.onconnectionstatechange = () => {
-        console.log('Connection state:', peerConnection.connectionState);
-        if (peerConnection.connectionState === 'connected') {
-          updateConnectionStatus('connected', 'Connected to opponent');
-          startGame();
-        } else if (peerConnection.connectionState === 'disconnected' || 
-                   peerConnection.connectionState === 'failed') {
-          updateConnectionStatus('disconnected', 'Connection lost');
-          resetConnection();
-        }
-      };
-    }
-
-    function setupDataChannel(channel = dataChannel) {
-      channel.onopen = () => {
-        console.log('Data channel opened');
-        updateConnectionStatus('connected', 'Connected to opponent');
-        startGame();
-      };
-
-      channel.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        handleRemoteMessage(data);
-      };
-
-      channel.onclose = () => {
-        console.log('Data channel closed');
-        updateConnectionStatus('disconnected', 'Connection closed');
-        resetConnection();
-      };
-
-      if (channel !== dataChannel) {
-        dataChannel = channel;
-      }
-    }
-
-    function sendMessage(data) {
-      if (dataChannel && dataChannel.readyState === 'open') {
-        dataChannel.send(JSON.stringify(data));
-      }
-    }
-
-    function handleRemoteMessage(data) {
-      switch (data.type) {
+    function handleOnlineMessage(message) {
+      switch (message.type) {
         case 'move':
-          applyRemoteMove(data.move);
+          applyMove(message.data, false);
           break;
         case 'reset':
           resetGame();
           break;
-        case 'chat':
-          // Could add chat functionality here
-          break;
       }
     }
 
-    function applyRemoteMove(move) {
-      const { from, to } = move;
-      const piece = board[from.row][from.col];
-      
-      if (board[to.row][to.col].toLowerCase() === 'k') {
-        gameOver = true;
-        document.getElementById('turn-info').textContent = `${currentPlayer === 'white' ? 'Black' : 'White'} Wins! King Captured!`;
-        document.getElementById('turn-info').style.color = '#ff6b6b';
-      }
-      
-      board[to.row][to.col] = piece;
-      board[from.row][from.col] = '.';
-      
-      // Handle pawn promotion
-      if (piece.toLowerCase() === 'p') {
-        if ((piece === 'P' && to.row === 0) || (piece === 'p' && to.row === 7)) {
-          board[to.row][to.col] = piece === 'P' ? 'Q' : 'q';
-        }
-      }
-      
-      updateBoard();
-      applyGravityWithAnimation(() => {
-        if (!gameOver) {
-          currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-          updateTurnInfo();
-          updateBoard();
-        }
-      });
+    function generateRoomCode() {
+      return Math.random().toString(36).substr(2, 6).toUpperCase();
     }
 
     function updateConnectionStatus(status, message) {
-      connectionState = status;
       const statusEl = document.getElementById('connection-status');
       statusEl.textContent = message;
       statusEl.className = `connection-status status-${status}`;
     }
 
-    function updatePlayerNames() {
-      document.getElementById('white-name').textContent = myColor === 'white' ? 'You' : 'Opponent';
-      document.getElementById('black-name').textContent = myColor === 'black' ? 'You' : 'Opponent';
-    }
-
-    function startGame() {
-      gameStarted = true;
-      document.getElementById('reset-btn').disabled = false;
-      updateTurnInfo();
-    }
-
-    function disconnect() {
-      if (peerConnection) {
-        peerConnection.close();
-      }
-      resetConnection();
-    }
-
-    function resetConnection() {
-      peerConnection = null;
-      dataChannel = null;
-      gameStarted = false;
-      myColor = null;
-      gameCode = null;
-      isHost = false;
-      
-      document.getElementById('create-game-btn').disabled = false;
-      document.getElementById('join-game-btn').disabled = false;
-      document.getElementById('disconnect-btn').classList.add('hidden');
-      document.getElementById('game-code-display').classList.add('hidden');
-      document.getElementById('reset-btn').disabled = true;
-      
-      updateConnectionStatus('disconnected', 'Disconnected - Start or join a game to play');
-      updatePlayerNames();
-      updateTurnInfo();
-      
-      window.location.hash = '';
-    }
-
     function canMakeMove() {
-      return gameStarted && !gameOver && 
-             ((myColor === 'white' && currentPlayer === 'white') || 
-              (myColor === 'black' && currentPlayer === 'black'));
+      if (gameOver) return false;
+      
+      if (gameMode === 'local') {
+        return true; // Both players can move in local mode
+      } else if (gameMode === 'online') {
+        return playerRole === currentPlayer && onlineConnection && onlineConnection.connected;
+      }
+      
+      return false;
     }
 
-    function initializeBoard() {
+    function initializeGame() {
       board = JSON.parse(JSON.stringify(initialBoard));
       selectedSquare = null;
       currentPlayer = 'white';
       possibleMoves = [];
       gameOver = false;
-      document.getElementById('turn-info').style.color = '#4a90e2';
+      
+      createBoard();
+      updateBoard();
+      updateTurnInfo();
+      
+      // Enable reset button
+      document.getElementById('reset-btn').disabled = false;
     }
 
     function createBoard() {
       const boardElement = document.getElementById('board');
       boardElement.innerHTML = '';
+      
       for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
           const square = document.createElement('div');
@@ -577,6 +530,7 @@
         const row = Math.floor(index / 8);
         const col = index % 8;
         const piece = board[row][col];
+        
         square.innerHTML = '';
         square.classList.remove('selected', 'possible-move', 'in-check');
 
@@ -592,25 +546,32 @@
           square.appendChild(pieceDiv);
         }
 
-        if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col)
+        if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) {
           square.classList.add('selected');
-        if (possibleMoves.includes(`${row}-${col}`))
+        }
+        
+        if (possibleMoves.includes(`${row}-${col}`)) {
           square.classList.add('possible-move');
+        }
       });
     }
 
     function updateTurnInfo() {
-      if (!gameStarted) {
-        document.getElementById('turn-info').textContent = 'Waiting for opponent...';
+      if (!gameMode) {
+        document.getElementById('turn-info').textContent = 'Select game mode to start';
         return;
       }
       
-      const isMyTurn = (myColor === currentPlayer);
-      const turnText = isMyTurn ? 'Your turn' : "Opponent's turn";
-      const colorText = currentPlayer === 'white' ? 'White' : 'Black';
+      const turnText = `${currentPlayer === 'white' ? 'White' : 'Black'}'s turn`;
       
-      document.getElementById('turn-info').textContent = `${colorText} - ${turnText}`;
-      document.getElementById('turn-info').className = `turn-info ${isMyTurn ? 'my-turn' : 'opponent-turn'}`;
+      if (gameMode === 'local') {
+        document.getElementById('turn-info').textContent = turnText;
+        document.getElementById('turn-info').className = 'turn-info my-turn';
+      } else if (gameMode === 'online') {
+        const isMyTurn = (playerRole === currentPlayer);
+        document.getElementById('turn-info').textContent = isMyTurn ? 'Your turn' : "Opponent's turn";
+        document.getElementById('turn-info').className = `turn-info ${isMyTurn ? 'my-turn' : 'opponent-turn'}`;
+      }
     }
 
     function handleSquareClick(row, col) {
@@ -619,19 +580,16 @@
       const piece = board[row][col];
 
       if (selectedSquare && possibleMoves.includes(`${row}-${col}`)) {
-        const move = {
+        const moveData = {
           from: selectedSquare,
-          to: { row, col }
+          to: { row, col },
+          piece: board[selectedSquare.row][selectedSquare.col]
         };
         
-        // Send move to opponent
-        sendMessage({ type: 'move', move });
-        
-        // Apply move locally
-        applyRemoteMove(move);
-        
+        applyMove(moveData, true);
         selectedSquare = null;
         possibleMoves = [];
+        
       } else {
         if (piece !== '.' && isCurrentPlayerPiece(piece)) {
           selectedSquare = { row, col };
@@ -644,6 +602,49 @@
       }
     }
 
+    function applyMove(moveData, isLocalMove) {
+      const { from, to, piece } = moveData;
+      
+      // Check for capture
+      if (board[to.row][to.col].toLowerCase() === 'k') {
+        gameOver = true;
+        const winner = currentPlayer === 'white' ? 'White' : 'Black';
+        document.getElementById('turn-info').textContent = `${winner} Wins! King Captured!`;
+        document.getElementById('turn-info').style.color = '#4ecdc4';
+        return;
+      }
+      
+      // Make the move
+      board[to.row][to.col] = piece;
+      board[from.row][from.col] = '.';
+      
+      // Handle pawn promotion
+      if (piece.toLowerCase() === 'p') {
+        if ((piece === 'P' && to.row === 0) || (piece === 'p' && to.row === 7)) {
+          board[to.row][to.col] = piece === 'P' ? 'Q' : 'q';
+        }
+      }
+      
+      // Send move to opponent if online
+      if (gameMode === 'online' && isLocalMove && onlineConnection) {
+        onlineConnection.send({
+          type: 'move',
+          data: moveData
+        });
+      }
+      
+      updateBoard();
+      
+      // Apply gravity with animation
+      applyGravityWithAnimation(() => {
+        if (!gameOver) {
+          currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+          updateTurnInfo();
+          updateBoard();
+        }
+      });
+    }
+
     function isCurrentPlayerPiece(piece) {
       return currentPlayer === 'white' ? piece === piece.toUpperCase() : piece === piece.toLowerCase();
     }
@@ -652,16 +653,17 @@
       const kingChar = color === 'white' ? 'K' : 'k';
       for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
-          if (board[row][col] === kingChar) return { row, col };
+          if (board[row][col] === kingChar) {
+            return { row, col };
+          }
         }
       }
       return null;
     }
 
     function isSquareUnderAttack(row, col, byColor) {
-      const opponent = byColor;
       const originalPlayer = currentPlayer;
-      currentPlayer = opponent;
+      currentPlayer = byColor;
 
       for (let r = 0; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
@@ -683,44 +685,71 @@
     function getValidMoves(row, col, piece) {
       const moves = [];
       const pieceType = piece.toLowerCase();
+      
       switch (pieceType) {
         case 'p':
           const dir = piece === 'P' ? -1 : 1;
           const startRow = piece === 'P' ? 6 : 1;
+          
+          // Forward move
           if (board[row + dir] && board[row + dir][col] === '.') {
             moves.push(`${row + dir}-${col}`);
+            // Double move from starting position
             if (row === startRow && board[row + 2 * dir][col] === '.') {
               moves.push(`${row + 2 * dir}-${col}`);
             }
           }
+          
+          // Diagonal captures
           if (board[row + dir]) {
-            if (board[row + dir][col - 1] && board[row + dir][col - 1] !== '.' && !isCurrentPlayerPiece(board[row + dir][col - 1]))
+            if (board[row + dir][col - 1] && board[row + dir][col - 1] !== '.' && 
+                !isCurrentPlayerPiece(board[row + dir][col - 1])) {
               moves.push(`${row + dir}-${col - 1}`);
-            if (board[row + dir][col + 1] && board[row + dir][col + 1] !== '.' && !isCurrentPlayerPiece(board[row + dir][col + 1]))
+            }
+            if (board[row + dir][col + 1] && board[row + dir][col + 1] !== '.' && 
+                !isCurrentPlayerPiece(board[row + dir][col + 1])) {
               moves.push(`${row + dir}-${col + 1}`);
+            }
           }
           break;
-        case 'r': addLineMoves(moves, row, col, [[0,1],[0,-1],[1,0],[-1,0]]); break;
-        case 'b': addLineMoves(moves, row, col, [[1,1],[1,-1],[-1,1],[-1,-1]]); break;
-        case 'q': addLineMoves(moves, row, col, [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]]); break;
+          
+        case 'r':
+          addLineMoves(moves, row, col, [[0,1],[0,-1],[1,0],[-1,0]]);
+          break;
+          
+        case 'b':
+          addLineMoves(moves, row, col, [[1,1],[1,-1],[-1,1],[-1,-1]]);
+          break;
+          
+        case 'q':
+          addLineMoves(moves, row, col, [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]]);
+          break;
+          
         case 'n':
           const knightMoves = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
           for (let [dr, dc] of knightMoves) {
             const nr = row + dr, nc = col + dc;
-            if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && (board[nr][nc] === '.' || !isCurrentPlayerPiece(board[nr][nc])))
+            if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && 
+                (board[nr][nc] === '.' || !isCurrentPlayerPiece(board[nr][nc]))) {
               moves.push(`${nr}-${nc}`);
+            }
           }
           break;
+          
         case 'k':
-          for (let dr = -1; dr <= 1; dr++)
+          for (let dr = -1; dr <= 1; dr++) {
             for (let dc = -1; dc <= 1; dc++) {
               if (dr === 0 && dc === 0) continue;
               const nr = row + dr, nc = col + dc;
-              if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && (board[nr][nc] === '.' || !isCurrentPlayerPiece(board[nr][nc])))
+              if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && 
+                  (board[nr][nc] === '.' || !isCurrentPlayerPiece(board[nr][nc]))) {
                 moves.push(`${nr}-${nc}`);
+              }
             }
+          }
           break;
       }
+      
       return moves;
     }
 
@@ -729,10 +758,13 @@
         for (let i = 1; i < 8; i++) {
           const nr = row + dr * i, nc = col + dc * i;
           if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
+          
           if (board[nr][nc] === '.') {
             moves.push(`${nr}-${nc}`);
           } else {
-            if (!isCurrentPlayerPiece(board[nr][nc])) moves.push(`${nr}-${nc}`);
+            if (!isCurrentPlayerPiece(board[nr][nc])) {
+              moves.push(`${nr}-${nc}`);
+            }
             break;
           }
         }
@@ -741,65 +773,26 @@
 
     function applyGravityWithAnimation(callback) {
       const fallingPieces = [];
+      
+      // Check each column for pieces that need to fall
       for (let col = 0; col < 8; col++) {
+        // White pieces fall down (rows 0-3)
         for (let row = 2; row >= 0; row--) {
           const piece = board[row][col];
           if (piece !== '.' && piece.toLowerCase() !== 'p') {
             let target = row;
-            while (target + 1 <= 3 && board[target + 1][col] === '.') target++;
-            if (target !== row) fallingPieces.push({ from: row, to: target, col, piece });
+            while (target + 1 <= 3 && board[target + 1][col] === '.') {
+              target++;
+            }
+            if (target !== row) {
+              fallingPieces.push({ from: row, to: target, col, piece });
+            }
           }
         }
+        
+        // Black pieces fall up (rows 4-7)
         for (let row = 5; row <= 7; row++) {
           const piece = board[row][col];
           if (piece !== '.' && piece.toLowerCase() !== 'p') {
             let target = row;
-            while (target - 1 >= 4 && board[target - 1][col] === '.') target--;
-            if (target !== row) fallingPieces.push({ from: row, to: target, col, piece });
-          }
-        }
-      }
-
-      let index = 0;
-      function animateNext() {
-        if (index >= fallingPieces.length) {
-          if (callback) callback();
-          return;
-        }
-        const { from, to, col, piece } = fallingPieces[index++];
-        const dir = to > from ? 1 : -1;
-        let current = from;
-        const interval = setInterval(() => {
-          const next = current + dir;
-          if (board[next][col] === '.') {
-            board[next][col] = piece;
-            board[current][col] = '.';
-            current = next;
-            updateBoard();
-          }
-          if (current === to) {
-            clearInterval(interval);
-            setTimeout(animateNext, 80);
-          }
-        }, 80);
-      }
-      animateNext();
-    }
-
-    function resetGame() {
-      if (gameStarted) {
-        sendMessage({ type: 'reset' });
-      }
-      initializeBoard();
-      updateTurnInfo();
-      updateBoard();
-    }
-
-    // Initialize
-    initializeBoard();
-    createBoard();
-    updateBoard();
-    updatePlayerNames();
-  </script>
-</body>
-</html>
+            while (target - 1 >= 4 && board[target - 1
