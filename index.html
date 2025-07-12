@@ -7,33 +7,38 @@
       font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
       margin: 0;
+      padding: 20px 0;
       background-color: #1a1a1a;
       color: white;
+      box-sizing: border-box;
     }
 
     .game-container {
       text-align: center;
       background-color: #2a2a2a;
-      padding: 30px;
+      padding: 20px;
       border-radius: 15px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      max-width: 90vw;
+      width: fit-content;
     }
 
     h1 {
       color: #4a90e2;
-      margin-bottom: 20px;
+      margin: 0 0 15px 0;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      font-size: 2rem;
     }
 
     .board {
       display: grid;
-      grid-template-columns: repeat(8, 80px);
-      grid-template-rows: repeat(8, 80px);
+      grid-template-columns: repeat(8, 70px);
+      grid-template-rows: repeat(8, 70px);
       gap: 2px;
-      margin: 20px auto;
+      margin: 15px auto;
       border: 3px solid #4a90e2;
       background-color: #333;
       position: relative;
@@ -52,12 +57,12 @@
     }
 
     .square {
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 64px;
+      font-size: 56px;
       font-weight: bold;
       cursor: pointer;
       position: relative;
@@ -87,6 +92,11 @@
     .square.in-check {
       background-color: #ff4d4d !important;
       border: 2px solid #ff0000;
+    }
+
+    .square.en-passant {
+      border-color: #ffa500;
+      background-color: #fff8dc;
     }
 
     .info {
@@ -140,6 +150,56 @@
       justify-content: center;
       align-items: center;
     }
+
+    .promotion-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .promotion-content {
+      background-color: #2a2a2a;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      border: 3px solid #4a90e2;
+    }
+
+    .promotion-pieces {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .promotion-piece {
+      width: 80px;
+      height: 80px;
+      background-color: #f0d9b5;
+      border: 2px solid #4a90e2;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .promotion-piece:hover {
+      background-color: #4ecdc4;
+      transform: scale(1.1);
+    }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -156,9 +216,17 @@
         • Black gravity: pieces fall to 5th rank<br>
         • Pawns act as floors - pieces stop falling on pawns<br>
         • Pieces stack on each other in the same file<br>
-        • Pawns promote to queens and then fall due to gravity<br>
+        • Pawns promote to your choice of piece and then fall due to gravity<br>
+        • En passant capture is available after enemy pawn moves 2 squares<br>
         • Capture the enemy king to win!
       </div>
+    </div>
+  </div>
+
+  <div id="promotion-modal" class="promotion-modal hidden">
+    <div class="promotion-content">
+      <h2>Choose promotion piece:</h2>
+      <div class="promotion-pieces" id="promotion-pieces"></div>
     </div>
   </div>
 
@@ -175,9 +243,13 @@
     ];
 
     let board = [], selectedSquare = null, currentPlayer = 'white', possibleMoves = [], gameOver = false;
+    let enPassantTarget = null; // {row, col} of square where en passant capture can happen
+    let pendingPromotion = null; // {row, col, piece} waiting for promotion choice
 
     function initializeBoard() {
       board = JSON.parse(JSON.stringify(initialBoard));
+      enPassantTarget = null;
+      pendingPromotion = null;
     }
 
     function createBoard() {
@@ -207,7 +279,7 @@
         const col = index % 8;
         const piece = board[row][col];
         square.innerHTML = '';
-        square.classList.remove('selected', 'possible-move', 'in-check');
+        square.classList.remove('selected', 'possible-move', 'in-check', 'en-passant');
 
         if ((whiteInCheck && row === whiteKing.row && col === whiteKing.col) ||
             (blackInCheck && row === blackKing.row && col === blackKing.col)) {
@@ -225,6 +297,8 @@
           square.classList.add('selected');
         if (possibleMoves.includes(`${row}-${col}`))
           square.classList.add('possible-move');
+        if (possibleMoves.includes(`${row}-${col}-ep`))
+          square.classList.add('en-passant');
       });
     }
 
@@ -236,8 +310,10 @@
       if (gameOver) return;
 
       const piece = board[row][col];
+      const moveKey = `${row}-${col}`;
+      const enPassantKey = `${row}-${col}-ep`;
 
-      if (selectedSquare && possibleMoves.includes(`${row}-${col}`)) {
+      if (selectedSquare && (possibleMoves.includes(moveKey) || possibleMoves.includes(enPassantKey))) {
         if (board[row][col].toLowerCase() === 'k') {
           gameOver = true;
           document.getElementById('turn-info').textContent = `${currentPlayer === 'white' ? 'White' : 'Black'} Wins! King Captured!`;
@@ -245,24 +321,35 @@
         }
 
         const movingPiece = board[selectedSquare.row][selectedSquare.col];
+        
+        // Handle en passant capture
+        if (possibleMoves.includes(enPassantKey)) {
+          const captureRow = currentPlayer === 'white' ? row + 1 : row - 1;
+          board[captureRow][col] = '.'; // Remove captured pawn
+        }
+
         board[row][col] = movingPiece;
         board[selectedSquare.row][selectedSquare.col] = '.';
 
+        // Check for pawn promotion
         if (movingPiece.toLowerCase() === 'p') {
-          if ((movingPiece === 'P' && row === 0) || (movingPiece === 'p' && row === 7))
-            board[row][col] = movingPiece === 'P' ? 'Q' : 'q';
+          if ((movingPiece === 'P' && row === 0) || (movingPiece === 'p' && row === 7)) {
+            pendingPromotion = { row, col, piece: movingPiece };
+            showPromotionModal();
+            return;
+          }
+          
+          // Check for en passant setup (pawn moved 2 squares)
+          if (Math.abs(selectedSquare.row - row) === 2) {
+            enPassantTarget = { row: (selectedSquare.row + row) / 2, col };
+          } else {
+            enPassantTarget = null;
+          }
+        } else {
+          enPassantTarget = null;
         }
 
-        selectedSquare = null;
-        possibleMoves = [];
-        updateBoard();
-        applyGravityWithAnimation(() => {
-          if (!gameOver) {
-            currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-            updateTurnInfo();
-            updateBoard();
-          }
-        });
+        completeTurn();
       } else {
         if (piece !== '.' && isCurrentPlayerPiece(piece)) {
           selectedSquare = { row, col };
@@ -272,6 +359,46 @@
           possibleMoves = [];
         }
         updateBoard();
+      }
+    }
+
+    function completeTurn() {
+      selectedSquare = null;
+      possibleMoves = [];
+      updateBoard();
+      applyGravityWithAnimation(() => {
+        if (!gameOver) {
+          currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+          updateTurnInfo();
+          updateBoard();
+        }
+      });
+    }
+
+    function showPromotionModal() {
+      const modal = document.getElementById('promotion-modal');
+      const piecesContainer = document.getElementById('promotion-pieces');
+      
+      modal.classList.remove('hidden');
+      piecesContainer.innerHTML = '';
+
+      const promotionPieces = currentPlayer === 'white' ? ['Q', 'R', 'B', 'N'] : ['q', 'r', 'b', 'n'];
+      
+      promotionPieces.forEach(piece => {
+        const pieceDiv = document.createElement('div');
+        pieceDiv.className = 'promotion-piece';
+        pieceDiv.textContent = pieceEmojis[piece];
+        pieceDiv.onclick = () => selectPromotion(piece);
+        piecesContainer.appendChild(pieceDiv);
+      });
+    }
+
+    function selectPromotion(piece) {
+      if (pendingPromotion) {
+        board[pendingPromotion.row][pendingPromotion.col] = piece;
+        pendingPromotion = null;
+        document.getElementById('promotion-modal').classList.add('hidden');
+        completeTurn();
       }
     }
 
@@ -299,7 +426,7 @@
           const piece = board[r][c];
           if (piece !== '.' && isCurrentPlayerPiece(piece)) {
             const moves = getValidMoves(r, c, piece);
-            if (moves.includes(`${row}-${col}`)) {
+            if (moves.some(move => move.startsWith(`${row}-${col}`))) {
               currentPlayer = originalPlayer;
               return true;
             }
@@ -314,23 +441,36 @@
     function getValidMoves(row, col, piece) {
       const moves = [];
       const pieceType = piece.toLowerCase();
+      
       switch (pieceType) {
         case 'p':
           const dir = piece === 'P' ? -1 : 1;
           const startRow = piece === 'P' ? 6 : 1;
+          
+          // Forward moves
           if (board[row + dir] && board[row + dir][col] === '.') {
             moves.push(`${row + dir}-${col}`);
             if (row === startRow && board[row + 2 * dir][col] === '.') {
               moves.push(`${row + 2 * dir}-${col}`);
             }
           }
+          
+          // Diagonal captures
           if (board[row + dir]) {
             if (board[row + dir][col - 1] && board[row + dir][col - 1] !== '.' && !isCurrentPlayerPiece(board[row + dir][col - 1]))
               moves.push(`${row + dir}-${col - 1}`);
             if (board[row + dir][col + 1] && board[row + dir][col + 1] !== '.' && !isCurrentPlayerPiece(board[row + dir][col + 1]))
               moves.push(`${row + dir}-${col + 1}`);
           }
+          
+          // En passant
+          if (enPassantTarget && enPassantTarget.row === row + dir) {
+            if (enPassantTarget.col === col - 1 || enPassantTarget.col === col + 1) {
+              moves.push(`${enPassantTarget.row}-${enPassantTarget.col}-ep`);
+            }
+          }
           break;
+          
         case 'r': addLineMoves(moves, row, col, [[0,1],[0,-1],[1,0],[-1,0]]); break;
         case 'b': addLineMoves(moves, row, col, [[1,1],[1,-1],[-1,1],[-1,-1]]); break;
         case 'q': addLineMoves(moves, row, col, [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]]); break;
@@ -452,6 +592,7 @@
       currentPlayer = 'white';
       possibleMoves = [];
       gameOver = false;
+      document.getElementById('promotion-modal').classList.add('hidden');
       document.getElementById('turn-info').style.color = '#4a90e2';
       updateTurnInfo();
       updateBoard();
